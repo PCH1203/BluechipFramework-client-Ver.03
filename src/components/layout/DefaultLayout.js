@@ -51,7 +51,6 @@ const App = ({ children }) => {
 
   let { pathname } = useLocation();
   pathname = pathname.replace("/", "");
-  console.log("location path name: " + pathname);
 
   useEffect(() => {
     if (pathname === "management/service") {
@@ -79,7 +78,7 @@ const App = ({ children }) => {
   };
 
   let scrollHeight = document.documentElement.scrollTop;
-  console.log("현재 스크롤 높이: " + scrollHeight);
+  // console.log("현재 스크롤 높이: " + scrollHeight);
 
   return (
     <Layout style={{ minHeight: "100vh" }}>

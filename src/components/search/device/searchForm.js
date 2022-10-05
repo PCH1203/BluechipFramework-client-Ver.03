@@ -48,10 +48,24 @@ const FormStyle = {
   background: "white",
 };
 
-const App = () => {
+const App = ({ getList }) => {
   const [form] = Form.useForm();
 
+  const [service, setService] = useState("");
+  const [serial, setSerial] = useState("");
+
+  const [searchCondition, setSearchCondition] = useState({
+    service: "",
+    serial: "",
+  });
+
   const [value, setValue] = useState("");
+
+  const reset = () => {
+    setService("");
+    setSerial("");
+    console.log("조건 리셋");
+  };
 
   const onChange = (value) => {
     setValue(value);
@@ -60,6 +74,7 @@ const App = () => {
 
   const onFinish = (values) => {
     console.log(values);
+    getList(values);
   };
 
   const onReset = () => {
@@ -81,22 +96,30 @@ const App = () => {
           {/* 1-1 */}
           <Col xl={{ span: 6 }}>
             <Form.Item
-              name=""
+              name="service"
               rules={[
                 {
-                  required: true,
+                  required: false,
                 },
               ]}
             >
               <Select
                 placeholder="서비스 선택"
-                // onChange={onGenderChange}
                 bordered={false}
                 allowClear
                 style={FormStyle}
+                value={service}
+                name="service"
+                onChange={(e) => {
+                  setService(e);
+                }}
+
+                // onChange={handleChangeConditon}
+                // onChange={(e) => setService(e)}
+                // onChange={(e) => console.log("value:", e)}
               >
-                <Option value="1">스마트 지킴이</Option>
-                <Option value="2">스마트 지킴이2</Option>
+                <Option value="tguard">스마트 지킴이</Option>
+                <Option value="tprotector">스마트 지킴이2</Option>
               </Select>
             </Form.Item>
           </Col>
@@ -107,7 +130,7 @@ const App = () => {
               name="계약일자"
               rules={[
                 {
-                  required: true,
+                  required: false,
                 },
               ]}
             >
@@ -133,7 +156,7 @@ const App = () => {
               name="배포처"
               rules={[
                 {
-                  required: true,
+                  required: false,
                 },
               ]}
             >
@@ -158,35 +181,43 @@ const App = () => {
             <Row gutter={2}>
               <Col xl={{ span: 8 }}>
                 <Form.Item
-                  name="제품번호"
+                  name="serial_category"
                   rules={[
                     {
-                      required: true,
+                      required: false,
                     },
                   ]}
                 >
                   <Select
-                    defaultValue={"1"}
+                    defaultValue={"serial"}
                     // onChange={onGenderChange}
                     bordered={false}
-                    allowClear
                     style={FormStyle}
                   >
-                    <Option value="1">제품 번호</Option>
-                    <Option value="2">착용자 명</Option>
+                    <Option value="serial">제품 번호</Option>
+                    <Option value="username">착용자 명</Option>
                   </Select>
                 </Form.Item>
               </Col>
               <Col xl={{ span: 15 }}>
                 <Form.Item
-                  name="서비스"
+                  name="serial"
                   rules={[
                     {
-                      required: true,
+                      required: false,
                     },
                   ]}
                 >
-                  <Input placeholder="" style={FormStyle} />
+                  <Input
+                    allowClear
+                    placeholder="정보를 입력하세요"
+                    style={FormStyle}
+                    value={searchCondition.serial}
+                    name="serial"
+                    onChange={(event) => {
+                      setSerial(event.target.value);
+                    }}
+                  />
                 </Form.Item>
               </Col>
             </Row>
@@ -196,35 +227,38 @@ const App = () => {
             <Row gutter={2}>
               <Col xl={{ span: 8 }}>
                 <Form.Item
-                  name="제품번호"
+                  name="admin"
                   rules={[
                     {
-                      required: true,
+                      required: false,
                     },
                   ]}
                 >
                   <Select
-                    defaultValue={"1"}
+                    defaultValue={"admin_name"}
                     // onChange={onGenderChange}
                     bordered={false}
-                    allowClear
                     style={FormStyle}
                   >
-                    <Option value="1">관리자 명</Option>
-                    <Option value="2">연락처</Option>
+                    <Option value="admin_name">관리자 명</Option>
+                    <Option value="admin_ph_no">연락처</Option>
                   </Select>
                 </Form.Item>
               </Col>
               <Col xl={{ span: 15 }}>
                 <Form.Item
-                  name="서비스"
+                  name="관리자"
                   rules={[
                     {
-                      required: true,
+                      required: false,
                     },
                   ]}
                 >
-                  <Input placeholder="" style={FormStyle} />
+                  <Input
+                    placeholder="정보를 입력하세요."
+                    style={FormStyle}
+                    allowClear
+                  />
                 </Form.Item>
               </Col>
             </Row>
@@ -244,7 +278,7 @@ const App = () => {
                   name="개통일"
                   rules={[
                     {
-                      required: true,
+                      required: false,
                     },
                   ]}
                 >
@@ -264,7 +298,7 @@ const App = () => {
                   name="개통여부"
                   rules={[
                     {
-                      required: true,
+                      required: false,
                     },
                   ]}
                 >
@@ -295,7 +329,7 @@ const App = () => {
             // label="Name"
             rules={[
               {
-                required: true,
+                required: false,
               },
             ]}
           >
@@ -309,6 +343,12 @@ const App = () => {
                   color: "white",
                   border: "none",
                 }}
+                onClick={() => {
+                  console.log("service: ", service, "serial: ", serial);
+                  console.log("조회버튼 클릭");
+                  // getList(service, serial);
+                  // reset();
+                }}
               >
                 조회
               </Button>
@@ -321,6 +361,7 @@ const App = () => {
                   color: "white",
                   border: "none",
                 }}
+
                 // onClick={onReset}
               >
                 초기화
