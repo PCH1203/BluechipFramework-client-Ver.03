@@ -4,6 +4,7 @@ const columns = [
   {
     title: "No",
     dataIndex: "no",
+    key: "key",
   },
   {
     title: "서비스 ID",

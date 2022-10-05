@@ -1,66 +1,133 @@
 import { Button, Table } from "antd";
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { AxiosCatch } from "./../../../util/AxiosCatch";
 const columns = [
   {
     title: "No",
-    dataIndex: "no",
-    width: 10,
+    dataIndex: "rowNum",
   },
   {
-    title: "계약 ID",
-    dataIndex: "service_id",
-    width: 100,
+    title: "제품번호",
+    dataIndex: "serialNo",
   },
 
   {
-    title: "CCBS 계약일자",
+    title: "회사명",
     dataIndex: "service",
-    width: 120,
   },
   {
-    title: "계약처",
+    title: "연락처",
     dataIndex: "app_eui",
-    width: 120,
   },
   {
-    title: "사업자번호",
-    dataIndex: "thing_plug_id",
-    width: 120,
+    title: "착용자 정보",
+    children: [
+      {
+        title: "이름",
+        dataIndex: "userName",
+      },
+      {
+        title: "생년월일",
+        dataIndex: "userBirthday",
+      },
+      {
+        title: "연락처",
+        dataIndex: "hpNo",
+      },
+    ],
   },
   {
-    title: "배포처",
-    dataIndex: "create_dt",
-    width: 120,
+    title: "최종위치측위정보",
+    children: [
+      {
+        title: "측위타입",
+        dataIndex: "username",
+      },
+      {
+        title: "측위방식",
+        dataIndex: "birthday",
+      },
+      {
+        title: "배터리잔량",
+        dataIndex: "phone",
+      },
+      {
+        title: "안심존상태",
+        dataIndex: "phone",
+      },
+      {
+        title: "측위시간",
+        dataIndex: "phone",
+      },
+    ],
   },
   {
-    title: "시작일",
-    dataIndex: "create_dt",
-    width: 120,
+    title: "설정정보",
+    children: [
+      {
+        title: "측위주기",
+        dataIndex: "username",
+      },
+      {
+        title: "배터리알림",
+        dataIndex: "birthday",
+      },
+      {
+        title: "SOS알림",
+        dataIndex: "phone",
+      },
+      {
+        title: "안심존알림",
+        dataIndex: "phone",
+      },
+    ],
   },
   {
-    title: "종료일",
-    dataIndex: "create_dt",
-    width: 120,
+    title: "관리자수",
+    dataIndex: "adminCount",
   },
   {
-    title: "개통 단말대수",
-    dataIndex: "create_dt",
-    width: 120,
+    title: "펌웨어 버전",
+    dataIndex: "version",
   },
   {
-    title: "CCTV 연동",
-    dataIndex: "create_dt",
-    width: 120,
+    title: "계약정보",
+    children: [
+      {
+        title: "개통일",
+        dataIndex: "username",
+      },
+      {
+        title: "시작일",
+        dataIndex: "birthday",
+      },
+      {
+        title: "종료일",
+        dataIndex: "phone",
+      },
+      {
+        title: "고객사명",
+        dataIndex: "phone",
+      },
+      {
+        title: "계약자명",
+        dataIndex: "phone",
+      },
+      {
+        title: "계약용도",
+        dataIndex: "phone",
+      },
+    ],
   },
-  {
-    title: "계약 용도",
-    dataIndex: "create_dt",
-    width: 120,
-  },
+
   {
     title: "Action",
     render: () => (
-      <Button style={{ background: "#d4380d", color: "white", border: "none" }}>
+      <Button
+        shape="round"
+        style={{ background: "#d4380d", color: "white", border: "none" }}
+      >
         {" "}
         삭제
       </Button>
@@ -86,6 +153,37 @@ for (let i = 0; i < 46; i++) {
 const App = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // 조회 데이터를 담을 list
+  const [list, setList] = useState(null);
+  const [list2, setList2] = useState([]);
+
+  useEffect(() => {
+    getList();
+  }, []);
+
+  const getList = async () => {
+    // 리스트 초기화
+    // setList(null);
+    const res = await axios.get(`/v2/api/portal/search/device`).catch((err) => {
+      AxiosCatch(err);
+      return;
+    });
+
+    if (!res) return;
+
+    setList(res.data.data);
+
+    for (let i = 0; i < 46; i++) {
+      setList2({
+        key: i,
+      });
+    }
+
+    console.log("res: ", res);
+    console.log("List: ", list);
+    console.log("List2: ", list2);
+  };
 
   const start = () => {
     setLoading(true); // ajax request after empty completing
@@ -136,11 +234,13 @@ const App = () => {
       <Table
         rowSelection={rowSelection}
         columns={columns}
-        dataSource={data}
+        dataSource={list}
+        // dataSource={data}
+        bordered={true}
         // scroll={{ x: 1300,  }}
-        scroll={{ x: "100vw" }}
+        scroll={{ x: "130vw" }}
         // bordered
-        // size="small"
+        size="small"
       />
     </div>
   );
