@@ -15,7 +15,12 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import LoginLayout from "../components/LoginLayout";
 import logo from "../static/images/protect_logo.svg";
-import SignForm from "../components/auth/SignForm";
+// import SignForm from "../components/auth/Step2";
+// import SignStep1 from "../components/auth/Step1";
+import SignLayout from "../components/auth/SignLayout";
+
+//testComponent
+import Testcom from "../components/auth/testComponent1";
 
 const App = () => {
   const onFinish = (values) => {
@@ -30,6 +35,7 @@ const App = () => {
 
   const onClose = () => {
     setOpen(false);
+    console.log("onClose 실행!");
   };
 
   return (
@@ -145,7 +151,10 @@ const App = () => {
                   open={open}
                   width="60vh"
                 >
-                  <SignForm />
+                  {/* <SignForm /> */}
+                  {/* <SignStep1 /> */}
+                  {/* <Testcom /> */}
+                  <SignLayout onClose={onClose} />
                 </Drawer>
               </Col>
             </Row>

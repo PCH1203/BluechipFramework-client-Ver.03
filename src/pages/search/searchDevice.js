@@ -20,8 +20,6 @@ const { Panel } = Collapse;
 const TestPage = () => {
   // TEST >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
   const [list, setList] = useState();
-  const [service, setService] = useState();
-  const [serial, setSerial] = useState();
 
   useEffect(() => {
     console.log("useEffect 실행");
@@ -44,12 +42,32 @@ const TestPage = () => {
       ) {
         queries.push(`service=${values.service}`);
       }
+
       if (
-        values.serial !== "" &&
-        values.serial !== undefined &&
-        values.serial !== null
+        values.ownerOption === "serialNo" &&
+        values.ownerOptionValue !== null &&
+        values.ownerOptionValue !== ""
       ) {
-        queries.push(`serial=${values.serial}`);
+        console.log("제품번호 검색");
+        queries.push(`ownerOption=${values.ownerOption}`);
+        queries.push(`ownerOptionValue=${values.ownerOptionValue}`);
+      }
+      if (
+        values.ownerOption === "ownerName" &&
+        values.ownerOptionValue !== null &&
+        values.ownerOptionValue !== ""
+      ) {
+        console.log("착용자명 검색");
+        queries.push(`ownerOption=${values.ownerOption}`);
+        queries.push(`ownerOptionValue=${values.ownerOptionValue}`);
+      }
+
+      if (
+        values.useYn !== "" &&
+        values.useYn !== undefined &&
+        values.useYn !== null
+      ) {
+        queries.push(`useYn=${values.useYn}`);
       }
     }
 
@@ -61,14 +79,14 @@ const TestPage = () => {
         return;
       });
     console.log("res: ", res);
-    console.log(`"query: /v2/api/portal/search/device/ " ${queryStr}`);
+    console.log(`URL: /v2/api/portal/search/device/${queryStr}`);
 
     // if (!res) return;
 
     setList(res.data.data);
   };
 
-  //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+  //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
   return (
     // console.log("관리 > 계약처 배포처 관리"),
     <DefaoultLayout title="assets" classname="grid">

@@ -7,8 +7,8 @@ export const headerConfig = {
   },
 };
 
-export const headerFileConfig = {
-  headers: {
-    "Content-Type": `multipart/form-data; utf-8`,
-  },
-};
+// export const headerFileConfig = {
+//   headers: {
+//     "Content-Type": `multipart/form-data; utf-8`,
+//   },
+// };

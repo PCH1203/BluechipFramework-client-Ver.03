@@ -25,6 +25,10 @@ const FormDisabledDemo = () => {
   //     setComponentDisabled(disabled);
   //   };
 
+  const onFinish = (values) => {
+    console.log("form_data: ", values);
+  };
+
   return (
     <>
       <Form
@@ -52,7 +56,15 @@ const FormDisabledDemo = () => {
             </div>
           </Upload>
         </Form.Item>
-        <Form.Item label="아이디">
+        <Form.Item
+          label="아이디"
+          name="userId"
+          rules={[
+            {
+              required: true,
+            },
+          ]}
+        >
           <Input />
           <Button type="primary" size="middle">
             중복확인
@@ -83,12 +95,6 @@ const FormDisabledDemo = () => {
           <Input />
           <Button type="primary" size="middle">
             중복확인
-          </Button>
-        </Form.Item>
-        <Form.Item label="전화번호">
-          <Input />
-          <Button type="primary" size="middle">
-            인증번호 받기
           </Button>
         </Form.Item>
         <Form.Item label="전화번호">

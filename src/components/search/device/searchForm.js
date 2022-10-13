@@ -10,6 +10,7 @@ import {
   Segmented,
   Select,
   RadioChangeEvent,
+  Popconfirm,
 } from "antd";
 import React, { useEffect, useState } from "react";
 const { Option } = Select;
@@ -53,13 +54,10 @@ const App = ({ getList }) => {
 
   const [service, setService] = useState("");
   const [serial, setSerial] = useState("");
+  const [open, setOpen] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
-  const [searchCondition, setSearchCondition] = useState({
-    service: "",
-    serial: "",
-  });
-
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState("Y");
 
   const reset = () => {
     setService("");
@@ -67,13 +65,13 @@ const App = ({ getList }) => {
     console.log("조건 리셋");
   };
 
-  const onChange = (value) => {
-    setValue(value);
-    console.log(value);
-  };
+  // const onChange = (value) => {
+  //   setValue(value);
+  //   console.log(value);
+  // };
 
   const onFinish = (values) => {
-    console.log(values);
+    console.log("form_data: ", values);
     getList(values);
   };
 
@@ -81,15 +79,41 @@ const App = ({ getList }) => {
     form.resetFields();
   };
 
-  const onFill = () => {
-    form.setFieldsValue({
-      note: "Hello world!",
-      gender: "male",
-    });
+  // const onFill = () => {
+  //   form.setFieldsValue({
+  //     note: "Hello world!",
+  //     gender: "male",
+  //   });
+  // };
+
+  // 초기화 confirm
+  const showPopconfirm = () => {
+    setOpen(true);
+  };
+
+  const handleOk = () => {
+    setConfirmLoading(true);
+    setTimeout(() => {
+      setOpen(false);
+      setConfirmLoading(false);
+      form.resetFields();
+    }, 1000);
+  };
+  const handleCancel = () => {
+    setOpen(false);
   };
 
   return (
-    <Form form={form} name="control-hooks" onFinish={onFinish}>
+    <Form
+      form={form}
+      name="control-hooks"
+      onFinish={onFinish}
+      // Form.Item의 기본값 세팅
+      initialValues={{
+        useYn: "Y",
+        ownerOption: "serialNo",
+      }}
+    >
       <Col span={24}>
         {/* 1번 Row */}
         <Row gutter={[12]}>
@@ -181,7 +205,7 @@ const App = ({ getList }) => {
             <Row gutter={2}>
               <Col xl={{ span: 8 }}>
                 <Form.Item
-                  name="serial_category"
+                  name="ownerOption"
                   rules={[
                     {
                       required: false,
@@ -189,19 +213,19 @@ const App = ({ getList }) => {
                   ]}
                 >
                   <Select
-                    defaultValue={"serial"}
+                    defaultValue={"serialNo"}
                     // onChange={onGenderChange}
                     bordered={false}
                     style={FormStyle}
                   >
-                    <Option value="serial">제품 번호</Option>
-                    <Option value="username">착용자 명</Option>
+                    <Option value="serialNo">제품 번호</Option>
+                    <Option value="ownerName">착용자 명</Option>
                   </Select>
                 </Form.Item>
               </Col>
               <Col xl={{ span: 15 }}>
                 <Form.Item
-                  name="serial"
+                  name="ownerOptionValue"
                   rules={[
                     {
                       required: false,
@@ -212,11 +236,7 @@ const App = ({ getList }) => {
                     allowClear
                     placeholder="정보를 입력하세요"
                     style={FormStyle}
-                    value={searchCondition.serial}
-                    name="serial"
-                    onChange={(event) => {
-                      setSerial(event.target.value);
-                    }}
+                    name="ownerOptionValue"
                   />
                 </Form.Item>
               </Col>
@@ -295,26 +315,17 @@ const App = ({ getList }) => {
               </Col>
               <Col xl={{ span: 15 }}>
                 <Form.Item
-                  name="개통여부"
+                  name="useYn"
                   rules={[
                     {
                       required: false,
                     },
                   ]}
                 >
-                  <Segmented
-                    options={[
-                      { label: "개통", value: "Y" },
-                      { label: "해지", value: "N" },
-                    ]}
-                    defaultValue={"Y"}
-                    // value={value}
-                    onChange={onChange}
-                  />
-                  {/* <Radio.Group onChange={onChange} value={value}>
-                    <Radio value={"Y"}>개통</Radio>
-                    <Radio value={"N"}>해지</Radio>
-                  </Radio.Group> */}
+                  <Radio.Group defaultValue="Y" buttonStyle="solid">
+                    <Radio.Button value="Y">개통</Radio.Button>
+                    <Radio.Button value="N">해지</Radio.Button>
+                  </Radio.Group>
                 </Form.Item>
               </Col>
             </Row>
@@ -346,26 +357,34 @@ const App = ({ getList }) => {
                 onClick={() => {
                   console.log("service: ", service, "serial: ", serial);
                   console.log("조회버튼 클릭");
-                  // getList(service, serial);
-                  // reset();
                 }}
               >
                 조회
               </Button>
-              <Button
-                type="primary"
-                htmlType="reset"
-                style={{
-                  marginRight: 8,
-                  background: "#d4380d",
-                  color: "white",
-                  border: "none",
+              <Popconfirm
+                title="검색 조건을 초기화 하시겠습니까?"
+                open={open}
+                onConfirm={handleOk}
+                okButtonProps={{
+                  loading: confirmLoading,
                 }}
-
-                // onClick={onReset}
+                onCancel={handleCancel}
               >
-                초기화
-              </Button>
+                <Button
+                  type="primary"
+                  htmlType="reset"
+                  style={{
+                    marginRight: 8,
+                    background: "#d4380d",
+                    color: "white",
+                    border: "none",
+                  }}
+                  // onClick={onReset}
+                  onClick={showPopconfirm}
+                >
+                  초기화
+                </Button>
+              </Popconfirm>
             </Col>
           </Form.Item>
         </Row>
