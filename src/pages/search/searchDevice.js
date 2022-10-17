@@ -9,16 +9,9 @@ import { CaretRightOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { AxiosCatch } from "./../../util/AxiosCatch";
 
-// const WrappedAdvancedSearchForm = Form.create({ name: "advanced_search" })(
-//   TableFilter
-// );
 const { Panel } = Collapse;
 
-// class Index extends React.Component {
-//   render() {
-
 const TestPage = () => {
-  // TEST >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
   const [list, setList] = useState();
 
   useEffect(() => {

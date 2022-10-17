@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import {
   Form,
   Input,
@@ -13,16 +13,11 @@ import {
 import SignLayout from "./SignLayout";
 import LbsAgree from "../../util/LbsAgree.txt";
 import FormItem from "antd/es/form/FormItem";
+import axios from "axios";
+import { AxiosCatch } from "../../util/AxiosCatch";
 const { RangePicker } = DatePicker;
 const { TextArea } = Input;
 const { Step } = Steps;
-
-// const tailLayout = {
-//   wrapperCol: {
-//     offset: 8,
-//     span: 16,
-//   },
-// };
 
 /**
  * step_1 회원가입 약관동의
@@ -33,21 +28,73 @@ const Step1 = ({ next, onClose }) => {
   const [checkAll, setCheckAll] = useState(false);
   const [checked1, setChecked1] = useState(false);
   const [checked2, setChecked2] = useState(false);
-  // const [test, setTest] = useState("호랑호랑");
-  // const [checkedList, setCheckedList] = useState([]);
-  // const [checkedItems, setCheckedItems] = useState([]);
+  const [agreementList, setAgreementList] = useState([]);
+  const [agreement1, setAgreement1] = useState();
+  const [agreement2, setAgreement2] = useState();
+  // const [agreementList, setAgreementList] = useState([
+  //   {
+  //     title: "",
+  //     contents: "",
+  //   },
+  //   {
+  //     title: "",
+  //     contents: "",
+  //   },
+  // ]);
 
-  useEffect(
-    (e) => {
-      console.log("useEffect 실행");
-      if (checked1 && checked2) {
-        setCheckAll(true);
-      } else {
-        setCheckAll(false);
-      }
-    },
-    [checked1, checked2]
-  );
+  useEffect(() => {
+    console.log("Agreement Effect 시작");
+    getAgreement();
+    console.log("Agreement Effect 종료");
+  }, []);
+
+  const getAgreement = async () => {
+    console.log("getAgreement 시작");
+    setAgreementList(null);
+
+    const res = await axios
+      .get(`/v2/api/portal/auth/loadAgreement`)
+      .catch((err) => {
+        AxiosCatch(err);
+        console.log("쿼리 못해옴");
+        return;
+      });
+    setAgreement1(res.data.data[0].contents);
+    setAgreement2(res.data.data[1].contents);
+    setAgreementList(res.data.data);
+    // setAgreementList(res.data.data[0].contents);
+    console.log("getAgreement: ", agreementList);
+    console.log("getAgreementLength: ", agreementList.length);
+    console.log("getAgreement 종료");
+  };
+
+  // const getAgreement = async () => {
+  //   console.log("getAgreement 시작");
+  //   const res = await axios
+  //     .get(`/v2/api/portal/auth/loadAgreement`)
+  //     .catch((err) => {
+  //       AxiosCatch(err);
+  //       console.log("getAgreement 종료");
+  //       return;
+  //     });
+  //     setAgreementList(res.data.data);
+  //   console.log("setAgreement 시작");
+  //   console.log("AgreementList: ", agreementList);
+  //   console.log("setAgreement 종료");
+  // };
+
+  // useEffect(
+  //   (e) => {
+  //     console.log("useEffect 실행");
+  //     // console.log("[step1]agreementMetaData: ", agreementList);
+  //     if (checked1 && checked2) {
+  //       setCheckAll(true);
+  //     } else {
+  //       setCheckAll(false);
+  //     }
+  //   },
+  //   [checked1, checked2]
+  // );
 
   const onChange = (e) => {
     if (e.target.name === "lbsAgreeYn") {
@@ -68,9 +115,6 @@ const Step1 = ({ next, onClose }) => {
       console.log("혹시1");
       console.log("Form.item", values);
 
-      // Form.Item("lbs_agree_yn").checked(true);
-      // Form.Item("lib_agree_yn").checked(true);
-
       setChecked1(true);
       setChecked2(true);
     }
@@ -90,7 +134,10 @@ const Step1 = ({ next, onClose }) => {
 
   return (
     // <>
+
     <div>
+      {console.log("Render_Agreement: ", agreementList)}
+      {/* {console.log("Render_Agreement: ", agreementList[0].contents)} */}
       {/* <Steps size="small" current={0}>
         <Step title="이용약관 동의" />
         <Step title="계정 정보 입력" />
@@ -115,7 +162,13 @@ const Step1 = ({ next, onClose }) => {
         <Divider />
 
         <h2>위치기반 서비스 이용약관 동의 (필수)</h2>
-        <TextArea rows={7} readOnly value={"약관 내용"}></TextArea>
+        <TextArea
+          rows={7}
+          readOnly
+          // value={"열받네"}
+          value={agreement1}
+          // value={agreementList[0].contents}
+        ></TextArea>
 
         {/* 체크박스 1 */}
         <Form.Item
@@ -147,7 +200,27 @@ const Step1 = ({ next, onClose }) => {
         <Divider />
 
         <h2>위치정보 사업 이용약관 동의 (선택)</h2>
-        <TextArea rows={7} readOnly value={"약관 내용"}></TextArea>
+        {/* {agreementList !== null && agreementList !== undefined ? (
+          agreementList.map((value, index) => {
+            return (
+              <TextArea
+                key={index}
+                rows={7}
+                readOnly
+                // value={"열받네"}
+                value={value.contents}
+              ></TextArea>
+            );
+          })
+        ) : (
+          <TextArea rows={7} readOnly value={"열받네"}></TextArea>
+        )} */}
+        <TextArea
+          rows={7}
+          readOnly
+          // value={"열받네"}
+          value={agreement2}
+        ></TextArea>
 
         {/* 체크박스 2 */}
         <Form.Item

@@ -1,5 +1,5 @@
 import { Button, Divider, message, Steps } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import Step1 from "./Step1";
 import Step2 from "./Step2";
 import Step3 from "./Step3";
@@ -7,27 +7,33 @@ import Step3 from "./Step3";
 import Testcomp1 from "./testComponent1";
 import Testcomp2 from "./testComponent2";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { AxiosCatch } from "../../util/AxiosCatch";
 const { Step } = Steps;
-// const steps = [
-//   {
-//     title: "이용약관 동의",
-//     content: <Step1 />,
-//     // content: <Testcomp1 />,
-//   },
-//   {
-//     title: "계정 정보 입력",
-//     content: <Step2 />,
-//     // content: <Testcomp2 />,
-//   },
-//   {
-//     title: "회원가입 완료",
-//     content: <Step3 />,
-//   },
-// ];
 
 const App = ({ onClose }) => {
   const [current, setCurrent] = useState(0);
   const [stepOneValues, setStepOneValues] = useState(null);
+  const [agreementList, setAgreementList] = useState();
+
+  useEffect(() => {
+    console.log("Agreement Effect 시작");
+    getAgreement();
+    console.log("Agreement Effect 종료");
+  }, []);
+
+  const getAgreement = async () => {
+    console.log("getAgreement 시작");
+    setAgreementList(null);
+    const res = await axios
+      .get(`/v2/api/portal/auth/loadAgreement`)
+      .catch((err) => {
+        AxiosCatch(err);
+        console.log("getAgreement 종료");
+        return;
+      });
+    setAgreementList(res.data.data);
+  };
 
   const stepNext1 = (step1Vaslues) => {
     console.log("stepNext1 실행!");
@@ -81,7 +87,6 @@ const App = ({ onClose }) => {
           <Step key={item.title} title={item.title} />
         ))}
       </Steps>
-
       <Divider />
       <div className="steps-content">{steps[current].content}</div>
       <div className="steps-action">
