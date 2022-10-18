@@ -13,25 +13,31 @@ import {
 } from "antd";
 import axios from "axios";
 import { headerConfig } from "../../util/axiosConfig";
+import Modal from "antd/lib/modal/Modal";
 const { Option } = Select;
 const { RangePicker } = DatePicker;
-const { TextArea } = Input;
 
 const Step2 = ({ next, onClose, currentReset, step1Values }) => {
-  //   const [componentDisabled, setComponentDisabled] = useState(true);
-
-  //   const onFormLayoutChange = ({ disabled }) => {
-  //     setComponentDisabled(disabled);
-  //   };
+  const [preCheckuserId, setPreCheckUserId] = useState("");
+  const [preCheckemail, setPreCheckEmail] = useState("");
+  const [formStatus, setFromStatus] = useState({
+    passwdCheck: "N",
+    userIdCheck: "N",
+    emailCheck: "N",
+  });
 
   const step2Finish = (step2Values) => {
-    console.log("step1Values: ", step1Values);
-    console.log("step2Values: ", step2Values);
-    addFromdata(step1Values, step2Values);
-    next();
+    console.log("회원가입 버튼 클릭!");
+    if (formStatus.userIdCheck !== "Y") {
+      alert("아이디 중복확인을 해주세요.");
+    } else if (formStatus.emailCheck !== "Y") {
+      alert("이메일 중복확인을 해주세요.");
+    } else {
+      addFromdata(step1Values, step2Values);
+      next();
+    }
   };
   const addFromdata = async (step1Values, step2Values) => {
-    // const formData = new FormData();
     const data = {
       userId: step2Values.userId,
       prePasswd: step2Values.prePasswd,
@@ -42,14 +48,6 @@ const Step2 = ({ next, onClose, currentReset, step1Values }) => {
       phoneNo: step2Values.phoneNo,
       lbsAgreeYn: step1Values.lbsAgreeYn ? "Y" : "N",
       libAgreeYn: step1Values.libAgreeYn ? "Y" : "N",
-
-      // formData.append("user_id", step2Values.userId);
-      // formData.append("pre_passwd", step2Values.prePasswd);
-      // formData.append("passwd", step2Values.passwd);
-      // formData.append("user_name", step2Values.userName);
-      // formData.append("service_id", step2Values.serviceId);
-      // formData.append("lbs_agree_yn", step1Values.lbsAgreeYn ? "Y" : "N");
-      // formData.append("lib_agree_yn", step1Values.libAgreeYn ? "Y" : "N");
     };
 
     const res = await axios
@@ -58,15 +56,60 @@ const Step2 = ({ next, onClose, currentReset, step1Values }) => {
         // setAddChecked(AxiosCatch(err));
         return;
       });
-    // if (!res) return;
-    // if (res.data.status === 200 && res.data.data !== 0) {
-    //   alert("챌린지를 등록합니다.");
-    //   onSaveEvent();
-    // } else if (res.data.data === 0) {
-    //   setTitleErrorMessage("중복된 챌린지명 입니다.");
-    //   setAddChecked(false);
-    //   return;
-    // }
+  };
+
+  const userIdCheck = async () => {
+    if (
+      preCheckuserId !== null &&
+      preCheckuserId !== undefined &&
+      preCheckuserId !== ""
+    ) {
+      const checkResult = await axios
+        .get(
+          `/v2/api/portal/auth/checkErrorUserIdDupl/?userId=${preCheckuserId}`
+        )
+        .catch((err) => {
+          // setAddChecked(AxiosCatch(err));
+          return;
+        });
+
+      if (checkResult.data.data > 0) {
+        setFromStatus({ ...formStatus, userIdCheck: "N" });
+        alert(checkResult.data.message);
+      } else {
+        setFromStatus({ ...formStatus, userIdCheck: "Y" });
+        alert(checkResult.data.message);
+        console.log("passwdCheck: ", formStatus.passwdCheck);
+        console.log("userIdCheck: ", formStatus.userIdCheck);
+      }
+    }
+  };
+
+  // 이메일 중복 검사
+  const emailCheck = async () => {
+    console.log("이메일 체크!");
+    console.log("preCheckemail: ", preCheckemail);
+    if (
+      preCheckemail !== null &&
+      preCheckemail !== undefined &&
+      preCheckemail !== ""
+    ) {
+      const checkResult = await axios
+        .get(`/v2/api/portal/auth/duplicateCheckEmail/?email=${preCheckemail}`)
+        .catch((err) => {
+          // setAddChecked(AxiosCatch(err));
+          return;
+        });
+
+      if (checkResult.data.data > 0) {
+        setFromStatus({ ...formStatus, emailCheck: "N" });
+        alert(checkResult.data.message);
+      } else {
+        setFromStatus({ ...formStatus, emailCheck: "Y" });
+        alert(checkResult.data.message);
+        console.log("emailCheck: ", formStatus.emailCheck);
+      }
+    }
   };
 
   return (
@@ -80,15 +123,12 @@ const Step2 = ({ next, onClose, currentReset, step1Values }) => {
           wrapperCol={{
             span: 24,
           }}
-          // layout="horizontal"
-          // onValuesChange={onFormLayoutChange}
-          // disabled={componentDisabled}
           initialValues={{
             serviceId: "tguard",
           }}
           onFinish={step2Finish}
         >
-          {/* <Row>
+          <Row>
             <Form.Item valuePropName="fileList">
               <Upload action="/upload.do" listType="picture-card">
                 <div>
@@ -103,7 +143,7 @@ const Step2 = ({ next, onClose, currentReset, step1Values }) => {
                 </div>
               </Upload>
             </Form.Item>
-          </Row> */}
+          </Row>
 
           <Form.Item
             // label="아이디"
@@ -113,6 +153,15 @@ const Step2 = ({ next, onClose, currentReset, step1Values }) => {
                 required: true,
               },
             ]}
+
+            // rules={[
+            //   {
+            //     validator: (_, value) =>
+            //       value
+            //         ? Promise.resolve()
+            //         : Promise.reject(new Error("약관에 동의해주세요.")),
+            //   },
+            // ]}
           >
             <Row gutter={8}>
               <Col span={24}>
@@ -120,6 +169,9 @@ const Step2 = ({ next, onClose, currentReset, step1Values }) => {
                   bordered={false}
                   style={{ borderBottom: "2px solid #8c8c8c" }}
                   placeholder="아이디"
+                  onChange={(e) => {
+                    setPreCheckUserId(e.target.value);
+                  }}
                 />
                 <Button
                   size="small"
@@ -130,6 +182,9 @@ const Step2 = ({ next, onClose, currentReset, step1Values }) => {
                     position: "absolute",
                     right: "5px",
                     background: "#bfbfbf",
+                  }}
+                  onClick={(e) => {
+                    userIdCheck();
                   }}
                 >
                   중복확인
@@ -178,6 +233,7 @@ const Step2 = ({ next, onClose, currentReset, step1Values }) => {
               />
             </Col>
           </Form.Item>
+
           <Form.Item name="userName">
             <Col span={24}>
               <Input
@@ -192,19 +248,33 @@ const Step2 = ({ next, onClose, currentReset, step1Values }) => {
               <Select
                 placeholder="서비스 구분"
                 bordered={false}
-                style={{ borderBottom: "2px solid  #8c8c8c" }}
+                style={{
+                  borderBottom: "2px solid  #8c8c8c",
+                  paddingLeft: 0,
+                  paddingRight: 0,
+                }}
               >
                 <Option value="tguard">스마트지킴이</Option>
                 <Option value="tprotector">스마트지킴이2</Option>
               </Select>
             </Col>
           </Form.Item>
-          <Col span={24}>
+          <Col
+            span={24}
+            style={{
+              paddingLeft: "0px",
+              paddingRight: "0px",
+            }}
+          >
             <Form.Item name="companyId">
               <Select
                 placeholder="회사명"
                 bordered={false}
-                style={{ borderBottom: "2px solid  #8c8c8c" }}
+                style={{
+                  borderBottom: "2px solid  #8c8c8c",
+                  paddingLeft: "0px",
+                  paddingRight: "0px",
+                }}
               >
                 <Option value="demo">블루칩씨엔에스</Option>
                 <Option value="demo">초코칩씨엔에스</Option>
@@ -230,6 +300,9 @@ const Step2 = ({ next, onClose, currentReset, step1Values }) => {
                   placeholder="이메일"
                   bordered={false}
                   style={{ borderBottom: "2px solid #8c8c8c" }}
+                  onChange={(e) => {
+                    setPreCheckEmail(e.target.value);
+                  }}
                 />
                 <Button
                   size="small"
@@ -240,6 +313,9 @@ const Step2 = ({ next, onClose, currentReset, step1Values }) => {
                     position: "absolute",
                     right: "5px",
                     background: "#bfbfbf",
+                  }}
+                  onClick={(e) => {
+                    emailCheck();
                   }}
                 >
                   중복확인
