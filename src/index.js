@@ -9,16 +9,19 @@ import reportWebVitals from "./reportWebVitals";
 // import Docs from "./pages/docs";
 
 import { BrowserRouter as Router, Link, Route, Switch } from "react-router-dom";
+// << 0. 로그인 >>
+import Login from "./pages/login";
+import LoginStep2 from "./pages/loginStep2";
 
 // << 1. 관리 >>
 import ServiceManagement from "./pages/serviceManagement";
 import companyManagement from "./pages/companyManagement";
 import contractManagement from "./pages/contractManagement";
 import managementDevice from "./pages/managementDevice";
-// << 2. 조화 >>
+
+// << 2. 조회 >>
 import searchDevice from "./pages/search/searchDevice";
 import Main from "./pages/main";
-import Login from "./pages/login";
 
 import DefaultLayout from "./components/DefaultLayout";
 
@@ -46,6 +49,7 @@ const routing = (
     <Switch>
       <Route exact path="/" component={Login} />
       <Route exact path="/login" component={Login} />
+      <Route exact path="/login/step2" component={LoginStep2} />
       <Route exact path="/main" component={Main} />
       <Route exact path="/management/service" component={ServiceManagement} />
       <Route exact path="/management/company" component={companyManagement} />

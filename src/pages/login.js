@@ -1,5 +1,9 @@
 /* eslint-disable jsx-a11y/alt-text */
-import { LockOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  ConsoleSqlOutlined,
+  LockOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import {
   Button,
   Card,
@@ -12,22 +16,58 @@ import {
   Row,
 } from "antd";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Redirect, Router, NavLink } from "react-router-dom";
 import LoginLayout from "../components/LoginLayout";
 import logo from "../static/images/protect_logo.svg";
-// import SignForm from "../components/auth/Step2";
-// import SignStep1 from "../components/auth/Step1";
 import SignLayout from "../components/auth/SignLayout";
+import LoginStep2 from "../pages/loginStep2";
 
-//testComponent
-import Testcom from "../components/auth/testComponent1";
+import axios from "axios";
+import { headerConfig } from "../util/axiosConfig";
+import { AxiosCatch } from "../util/AxiosCatch";
 
 const App = () => {
+  const [open, setOpen] = useState(false);
+
   const onFinish = (values) => {
-    console.log("Received values of form: ", values);
+    console.log("아이디: ", values.userId);
+    console.log("비밀번호: ", values.passwd);
+    portalLoginStep1(values);
   };
 
-  const [open, setOpen] = useState(false);
+  const portalLoginStep1 = async (values) => {
+    console.log("포탈 로그인 step1");
+    //api 요청시 전달할 파라미터 배열 생성
+    const queries = [];
+
+    queries.push(`userId=${values.userId}`);
+    queries.push(`passwd=${values.passwd}`);
+
+    const queryStr = queries.length > 0 ? `?${queries.join("&")}` : "";
+
+    console.log("queryStr: ", queryStr);
+
+    const res = await axios
+      .post(`/v2/api/portal/auth/pre-login${queryStr}`)
+      .catch((err) => {
+        AxiosCatch(err);
+        return;
+      });
+    console.log("res: ", res);
+
+    if (res.data.status === 200) {
+      console.log("1차로그인 성공");
+      document.location.href = "/login/step2";
+      nextStep();
+      return <link to="/login.step2" />;
+    } else if (res.data.status === 401) {
+      alert("사용자 정보가 올바르지 않습니다.");
+    }
+  };
+
+  const nextStep = () => {
+    return <link to="/login.step2" />;
+  };
 
   const showDrawer = () => {
     setOpen(true);
@@ -69,7 +109,7 @@ const App = () => {
           onFinish={onFinish}
         >
           <Form.Item
-            name="username"
+            name="userId"
             rules={[
               {
                 required: true,
@@ -87,7 +127,7 @@ const App = () => {
             />
           </Form.Item>
           <Form.Item
-            name="password"
+            name="passwd"
             rules={[
               {
                 required: true,
@@ -107,7 +147,6 @@ const App = () => {
               <Checkbox>ID 기억하기</Checkbox>
             </Form.Item>
           </Form.Item>
-
           <Form.Item>
             <Button
               type="danger"
@@ -116,10 +155,12 @@ const App = () => {
               block
               size="large"
               shape="round"
-              style={{}}
+              // onClick={nextStep}
             >
-              <Link to="/management/service">로그인</Link>
+              로그인
             </Button>
+          </Form.Item>
+          <Form.Item>
             <Row gutter={30} justify="center" style={{ marginTop: "5vh" }}>
               <Col>
                 <a href="" style={{ color: "white" }}>
