@@ -19,6 +19,7 @@ import React, { useState } from "react";
 import { Link, Redirect, Router, NavLink } from "react-router-dom";
 import LoginLayout from "../components/LoginLayout";
 import logo from "../static/images/protect_logo.svg";
+import bluechipLogo from "../static/images/bluechip.png";
 import SignLayout from "../components/auth/SignLayout";
 import LoginStep2 from "../pages/loginStep2";
 
@@ -88,7 +89,8 @@ const App = () => {
         }}
       >
         <img
-          src={logo}
+          // src={logo}
+          src={bluechipLogo}
           style={{ width: "30vh", filter: "drop-shadow(2px 4px 6px black)" }}
         />
       </div>

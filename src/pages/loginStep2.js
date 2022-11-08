@@ -110,7 +110,7 @@ const App = () => {
             <Input
               prefix={<PhoneOutlined className="site-form-item-icon" />}
               type="tel"
-              pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+              // pattern="[0-9]{3}-[0-9]{4}-[0-9]{4}"
               placeholder="전화번호"
               style={{
                 borderRadius: "5px",
